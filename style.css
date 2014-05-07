@@ -1,0 +1,312 @@
+/* Headers and body fonts (for Credits and Help pages) */
+h1 {
+	font-family: "Berlin Sans FB Demi", Arial, sans-serif;
+}
+h2 {
+	font-family: "Berlin Sans FB Demi", Arial, sans-serif;
+}
+body {
+	font-family: Arial, sans-serif
+}
+
+/* Displays the game's title in the same font it appears in in the game */
+.gametitle {
+	font-family: "Berlin Sans FB Demi", Arial, sans-serif;
+}
+
+/* Displays orange, bolded text */
+.orangetext {
+	font-weight: bold;
+	color: #FF9900;
+}
+
+/* Displays blue, bolded text */
+.bluetext {
+	font-weight: bold;
+	color: #0033CC;
+}
+
+/* Background shading to make orange text readable, used on other sections for consistency */
+.content {
+	background-color: #CCC;
+}
+
+/* Allows images to preload invisibly */
+#preload {
+	display: none;
+}
+
+/* Sets the gameboard size regardless of window size */
+#gameboard {
+	position: absolute;
+	left: 8px;
+	top: 8px;
+    width: 1000px;
+    height: 650px;
+    margin: 0 auto;
+}
+
+/* The character movable by the player */
+.character {
+	z-index: 3;
+	position: absolute;
+	width: 50px;
+	height: 50px;
+}
+
+/* The tiles that glow in and out on the map */
+.midlayer {
+	z-index: 1;
+	opacity: 0.8;
+}
+
+/* The key that the player shouldn't drop! */
+#key {
+	z-index: 3;
+	position: absolute;
+	width: 75px;
+	height: 75px;
+}
+
+/* The map the game takes place on */
+#mapimage {
+	position: absolute;
+	left: 8px;
+	top: 8px;
+	z-index: -5;
+	width: 1000px;
+	height: 650px;
+}
+
+/* Positions the treasure chest on the screen */
+#treasurechest {
+	position: absolute;
+	width: 50px;
+	height: 50px;
+	z-index: -2;
+}
+
+/* Makes the tiles display with no gaps */
+.tint {
+	display: inline-block;
+}
+
+/* Tints tile blue to allow movement */
+.available {
+	background: #0033CC;
+	opacity: 0.4;
+}
+
+/* Tints tile orange to allow key use */
+.attackable  {
+	background: #FF9900;
+	opacity: 0.4;
+}
+
+/* Makes tiles transparent to allow them to be tinted */
+.transparent {
+	opacity: 0.6;
+}
+
+
+/* Positions the stars' initial pre-animation state */
+.star {
+	z-index: 7;
+	position: absolute;
+	width: 50px;
+	height: 50px;
+	left: 660px;
+	top: 250px;
+}
+
+/* Positions the jewel */
+.jewel {
+	z-index: 7;
+	opacity: 0;
+	position: absolute;
+	width: 50px;
+	height: 50px;
+	left: 708px;
+	top: 258px;
+}
+
+/* Positions text to be in the middle of the screen */
+.middletext {
+	z-index: 10;
+	opacity: 0;
+	position: absolute;
+	top:208px;
+	left:308px;	
+}
+
+/* Creates a dark shadow backdrop for the game end screen */
+#shadow {
+	position: absolute;
+	left: 8px;
+	top: 8px;
+	z-index: 5;
+	width: 1000px;
+	height: 650px;
+	opacity: 0;
+}
+
+/* Positions the title screen title image */
+#titleimg {
+	position: absolute;
+	left: 280px;
+	top: 170px;
+	z-index: 6;
+}
+
+/* Creates a dark shadow backdrop for the title screen */
+#titleshadow {
+	position: absolute;
+	left: 8px;
+	top: 8px;
+	z-index: 5;
+	width: 1000px;
+	height: 650px;
+	opacity: 0.7;
+}
+
+/* Positions the "You dropped the key" message */
+#keysnow {
+	z-index: 10;
+	opacity: 0;
+	position: absolute;
+	top:8px;
+	left:128px;
+}
+
+/* Positions the Game Over message */
+#gameover {
+	z-index: 10;
+	opacity: 0;
+	position: absolute;
+	top:258px;
+	left:258px;
+}
+
+/* Positions the Help link button */
+#howtoplay {
+	position: absolute;
+	left: 18px;
+	top: 578px;
+	z-index: 6;
+}
+
+/* Positions the Credits link button */
+#credits {
+	position: absolute;
+	left: 778px;
+	top: 585px;
+	z-index: 6;
+}
+
+/* Positions the "Play Again?" messages */
+.again {
+	z-index: 10;
+	opacity: 0;
+	position: absolute;
+	top:358px;
+	left:348px;
+}
+
+/* CSS ANIMATIONS AND ANIMATION CLASSES*/
+
+/* The element will rotate back and forth in a wiggling motion */
+.wiggling {
+	-webkit-animation-duration: 2s;
+	-webkit-animation-name: wiggle;
+	-webkit-animation-iteration-count: infinite;
+	animation: wiggle 2s infinite;	
+}
+
+@-webkit-keyframes wiggle {
+	0% {-webkit-transform:rotate(15deg)}
+	50% {-webkit-transform:rotate(-15deg)}
+	100% {-webkit-transform:rotate(15deg)}
+}
+
+@keyframes wiggle {
+	0% {transform:rotate(15deg)}
+	50% {transform:rotate(-15deg)}
+	100% {transform:rotate(15deg)}
+}
+
+
+/* The tile will fade in and out */
+.tile {
+	opacity: 0;
+	-webkit-animation-duration: 5s;
+	-webkit-animation-name: gridanim;
+	-webkit-animation-iteration-count: infinite;
+	animation: gridanim 5s infinite;
+}
+
+@-webkit-keyframes gridanim {
+	0% { opacity: 0.3; }
+	50% { opacity: 0; }
+	100% { opacity: 0.3; }
+}
+
+@keyframes gridanim {
+	0% { opacity: 0.3; }
+	50% { opacity: 0; }
+	100% { opacity: 0.3; }
+}
+
+
+/* The "click to start!" message will fade in and out */
+#startmsg {
+	opacity: 0;
+	-webkit-animation-duration: 2s;
+	-webkit-animation-name: startanim;
+	-webkit-animation-iteration-count: infinite;
+	animation: startanim 2s infinite;
+	position: absolute;
+	left: 368px;
+	top: 470px;
+	z-index: 5;
+}
+
+@-webkit-keyframes startanim {
+	0% { opacity: 0; }
+	50% { opacity: 0.7; }
+	100% { opacity: 0; }
+}
+
+@keyframes startanim {
+	0% { opacity: 0; }
+	50% { opacity: 0.7; }
+	100% { opacity: 0; }
+}
+
+
+/* A subtle overcast of cloud shadows will slowly appear and disappear*/
+.cloudimage {
+	position: absolute;
+	left: 8px;
+	top: 8px;
+	z-index: -1;
+	width: 1000px;
+	height: 650px;
+	opacity: 0.3;
+	-webkit-animation-duration: 20s;
+	-webkit-animation-name: cloudanim;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-timing-function: linear;
+	animation: cloudanim 20s infinite linear;
+}
+
+@-webkit-keyframes cloudanim {
+	0% { opacity: 0.3; }
+	50% { opacity: 0; }
+	100% { opacity: 0.3; }
+}
+
+@keyframes cloudanim {
+	0% { opacity: 0.3; }
+	50% { opacity: 0; }
+	100% { opacity: 0.3; }
+}
