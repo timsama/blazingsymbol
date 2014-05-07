@@ -91,15 +91,15 @@ body {
 	display: inline-block;
 }
 
-/* Tints tile blue to allow movement */
-.available {
-	background: #0033CC;
+/* Tints tile orange to allow attacks */
+.attackable  {
+	background: #FF9900;
 	opacity: 0.4;
 }
 
-/* Tints tile orange to allow key use */
-.attackable  {
-	background: #FF9900;
+/* Tints tile blue to allow movement */
+.available {
+	background: #0033CC;
 	opacity: 0.4;
 }
 

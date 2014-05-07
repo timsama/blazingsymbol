@@ -1,90 +1,3 @@
-	var map;
-
-	// "constructor" function for the page
-	$(function() {
-		// preload images
-		preload();
-
-		map = new MapView({width: 20, height: 13, costMatrix:
-			[[255,255,255,1,255,1,1,1,1,1,1,1,1]
-			,[255,255,255,1,1,1,1,255,255,1,1,1,1]
-			,[255,255,255,1,1,1,1,255,255,1,1,1,1]
-			,[255,255,255,1,1,1,1,255,255,1,1,1,1]
-			,[255,255,255,1,1,1,255,255,255,1,1,1,1]
-			,[255,255,255,1,1,1,1,1,1,1,1,1,1]
-			,[255,1,1,255,1,1,1,1,1,1,255,1,1]
-			,[255,1,1,1,1,1,1,1,1,1,1,1,1]
-			,[1,1,1,1,255,1,1,1,1,1,1,1,1]
-			,[1,1,1,1,1,1,1,1,1,1,1,1,1]
-			,[1,1,1,1,1,1,255,255,1,1,1,1,1]
-			,[1,1,1,1,1,1,255,255,1,1,1,1,1]
-			,[1,1,1,1,1,1,1,1,1,1,1,1,255]
-			,[1,1,1,1,1,1,1,1,255,255,1,255,255]
-			,[1,1,1,1,1,1,1,1,255,255,1,255,255]
-			,[1,255,1,1,1,1,1,1,1,255,1,255,255]
-			,[1,1,1,1,1,1,1,1,1,1,255,255,255]
-			,[1,1,1,1,1,1,1,1,1,255,255,255,255]
-			,[1,1,1,1,1,1,1,1,1,255,255,255,255]
-			,[1,1,1,1,1,1,1,1,1,255,255,255,255]]
-		});
-
-		// create the map
-		$("#map").append("<img id='mapimage' src='images/stormwatchmap.jpg'>");
-		$("#map").append("<img id='cloudimage' class='cloudimage' src='images/clouds.png'>");
-	});
-
-	// adds HTML to preload every image used to prevent loading when images are needed
-	function preload(){
-		var preloadHTML = "";
-
-		// preload arrow corners
-		preloadHTML = preloadHTML + imageHTML("b_l_corner.png");
-		preloadHTML = preloadHTML + imageHTML("b_r_corner.png");
-		preloadHTML = preloadHTML + imageHTML("u_l_corner.png");
-		preloadHTML = preloadHTML + imageHTML("u_r_corner.png");
-
-		// preload arrow heads
-		preloadHTML = preloadHTML + imageHTML("left_arrow.png");
-		preloadHTML = preloadHTML + imageHTML("right_arrow.png");
-		preloadHTML = preloadHTML + imageHTML("up_arrow.png");
-		preloadHTML = preloadHTML + imageHTML("down_arrow.png");
-
-		// preload arrow stubs
-		preloadHTML = preloadHTML + imageHTML("left_stub.png");
-		preloadHTML = preloadHTML + imageHTML("right_stub.png");
-		preloadHTML = preloadHTML + imageHTML("up_stub.png");
-		preloadHTML = preloadHTML + imageHTML("down_stub.png");
-
-		// preload arrow lines
-		preloadHTML = preloadHTML + imageHTML("horizontal_line.png");
-		preloadHTML = preloadHTML + imageHTML("vertical_line.png");
-
-		// preload sprites
-		preloadHTML = preloadHTML + imageHTML("character princess girl.png");
-		preloadHTML = preloadHTML + imageHTML("chest closed.png");
-		preloadHTML = preloadHTML + imageHTML("chest open.png");
-		preloadHTML = preloadHTML + imageHTML("key.png");
-		preloadHTML = preloadHTML + imageHTML("gem blue.png");
-		preloadHTML = preloadHTML + imageHTML("star.png");
-
-		// preload UI elements
-		preloadHTML = preloadHTML + imageHTML("gameover.png");
-		preloadHTML = preloadHTML + imageHTML("grid.png");
-		preloadHTML = preloadHTML + imageHTML("keysnow.png");
-		preloadHTML = preloadHTML + imageHTML("playagain.png");
-		preloadHTML = preloadHTML + imageHTML("tryagain.png");
-		preloadHTML = preloadHTML + imageHTML("you win.png");
-		preloadHTML = preloadHTML + imageHTML("title.png");	
-
-		// load the images into the page
-		$("#preload").append(preloadHTML);
-	}
-
-	// returns a string of the HTML needed to create an image with the given source
-	function imageHTML(src){
-		return "<img src='	images/" + src + "'/>";
-	}
-
 // constructor for an MapView
 function MapView(mapstats){
 	this.width = mapstats.width;
@@ -92,16 +5,9 @@ function MapView(mapstats){
 	this.MapModel = new MapModel(mapstats);
 	this.mapimage = mapstats.mapimage;
 
-	// set the current starting point
-	this.origin_x = 14;
-	this.origin_y = 10;
-
-	// set the current ending point
-	this.end_x = 14;
-	this.end_y = 10;
-
 	// find the paths from the current starting point
-	this.paths = this.MapModel.FindPaths({x: 14, y: 10}, this.range);
+	this.paths = this.MapModel.FindPaths();
+	this.attackpaths = this.MapModel.FindAttackPaths(this.paths);
 
 	// draw the tiles for the first time
 	this.DrawTiles();
@@ -115,9 +21,9 @@ MapView.prototype.SetOrigin = function(param){
 		return;
 
 	// set the new origin
-	this.origin_x = param.data.x;
-	this.origin_y = param.data.y;
-	this.paths = this.MapModel.FindPaths({x: param.data.x, y: param.data.y}, this.range);
+	this.MapModel.SetOrigin(param);
+	this.paths = this.MapModel.FindPaths();
+	this.attackpaths = this.MapModel.FindAttackPaths(this.paths);
 	this.PaintTiles();
 }
 
@@ -154,9 +60,15 @@ MapView.prototype.CreateTile = function(param){
 };
 
 // displays a tile as available to be moved to
-MapView.prototype.PaintTile = function(param){
+MapView.prototype.PaintMoveTile = function(param){
 	$("#tile" + param.x + "_" + param.y).addClass("transparent");
 	$("#tint" + param.x + "_" + param.y).addClass("available");
+};
+
+// displays a tile as available to be attacked
+MapView.prototype.PaintAttackTile = function(param){
+	$("#tile" + param.x + "_" + param.y).addClass("transparent");
+	$("#tint" + param.x + "_" + param.y).addClass("attackable");
 };
 
 // paints all tiles available to be moved to or attacked
@@ -168,7 +80,12 @@ MapView.prototype.PaintTiles = function(){
 
 	// draw the accessible tiles
 	for(var tile in this.paths){
-		this.PaintTile(this.paths[tile]);
+		this.PaintMoveTile(this.paths[tile]);
+	}
+
+	// draw the attackable tiles
+	for(var tile in this.attackpaths){
+		this.PaintAttackTile(this.attackpaths[tile]);
 	}
 };
 
