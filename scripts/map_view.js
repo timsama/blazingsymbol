@@ -6,10 +6,6 @@ function MapView(mapstats){
 	this.MapModel.View = this;
 	this.mapimage = mapstats.mapimage;
 
-	// find the paths from the current starting point
-	this.paths = this.MapModel.FindPaths();
-	this.attackpaths = this.MapModel.FindAttackPaths(this.paths);
-
 	// draw the tiles for the first time
 	this.DrawTiles();
 	this.PaintTiles();
@@ -18,14 +14,11 @@ function MapView(mapstats){
 // sets a new location to draw arrows from
 MapView.prototype.SetOrigin = function(param){
 	// check if the new origin is within the set of accessible tiles
-	if(this.paths == null || typeof(this.paths[param.data.x + "-" + param.data.y]) == 'undefined')
+	if(this.MapModel.paths == null || typeof(this.MapModel.paths[param.data.x + "-" + param.data.y]) == 'undefined')
 		return;
 
 	// set the new origin
 	this.MapModel.SetOrigin(param);
-	this.paths = this.MapModel.FindPaths();
-	this.attackpaths = this.MapModel.FindAttackPaths(this.paths);
-	this.PaintTiles();
 }
 
 // creates the tiles that outline locations on the map
@@ -83,13 +76,13 @@ MapView.prototype.PaintTiles = function(){
 	$('.attackable').removeClass('attackable');
 
 	// draw the accessible tiles
-	for(var tile in this.paths){
-		this.PaintMoveTile(this.paths[tile]);
+	for(var tile in this.MapModel.paths){
+		this.PaintMoveTile(this.MapModel.paths[tile]);
 	}
 
 	// draw the attackable tiles
-	for(var tile in this.attackpaths){
-		this.PaintAttackTile(this.attackpaths[tile]);
+	for(var tile in this.MapModel.attackpaths){
+		this.PaintAttackTile(this.MapModel.attackpaths[tile]);
 	}
 };
 
@@ -106,24 +99,24 @@ MapView.prototype.DrawPath = function(end){
 	// if the destination is not in the paths set, don't draw anything new
 	var index = end.data.x + "-" + end.data.y;
 	var prev = index;
-	if(this.paths == null || typeof(this.paths[index]) == 'undefined')
+	if(this.MapModel.paths == null || typeof(this.MapModel.paths[index]) == 'undefined')
 		return;
 
 	// clear existing arrows out
 	$("div[id='arrows']").empty();
 
 	// draw the arrowhead
-	this.drawend(this.paths[index].predecessor, this.paths[index]);
+	this.drawend(this.MapModel.paths[index].predecessor, this.MapModel.paths[index]);
 
 	// draw the arrow body
-	while (this.paths[index].predecessor != this.paths[index]){
-		this.drawmid(this.paths[index].predecessor, this.paths[index], this.paths[prev], index);
+	while (this.MapModel.paths[index].predecessor != this.MapModel.paths[index]){
+		this.drawmid(this.MapModel.paths[index].predecessor, this.MapModel.paths[index], this.MapModel.paths[prev], index);
 		prev = index;
-		index = this.paths[index].predecessor.key;
+		index = this.MapModel.paths[index].predecessor.key;
 	}
 
 	// draw the arrow beginning
-	this.drawstart(this.paths[index], this.paths[prev]);
+	this.drawstart(this.MapModel.paths[index], this.MapModel.paths[prev]);
 }
 
 // draws the start of an arrow showing the path

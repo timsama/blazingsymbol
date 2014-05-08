@@ -24,6 +24,10 @@ function MapModel(mapstats){
 		actor.model = that;
 		that.ObstacleMap[actor.x][actor.y] = actor;
 	}
+
+	// find the paths from the current starting point
+	this.FindPaths();
+	this.FindAttackPaths();
 };
 
 // returns the traversal cost of a single tile in the map
@@ -40,10 +44,22 @@ MapModel.prototype.GetCost = function(x, y){
 
 // sets the origin to find all paths from
 MapModel.prototype.SetOrigin = function(param){
+	// clear existing arrows from the view
 	this.View.ClearArrows();
+	
+	// move this character's location in the obstacle map
 	this.ObstacleMap[this.SelectedCharacter.x][this.SelectedCharacter.y] = null;
 	this.ObstacleMap[param.data.x][param.data.y] = this.SelectedCharacter;
+	
+	// animate the character to their new location
 	this.SelectedCharacter.MoveTo({x: param.data.x, y: param.data.y});
+
+	// find the new paths from this location
+	this.FindPaths();
+	this.FindAttackPaths();
+
+	// repaint the view
+	this.View.PaintTiles();
 }
 
 // selects or deselects a character for their turn
@@ -51,16 +67,16 @@ MapModel.prototype.SelectCharacter = function(character){
 	// deselect and return if we're just deselecting
 	if(character == null){
 		this.SelectedCharacter = null;
-		this.View.paths = null;
-		this.View.attackpaths = null;
+		this.paths = null;
+		this.attackpaths = null;
 		this.View.PaintTiles();
 		return;
 	}
 
 	// otherwise, select the passed-in character and paint their available tiles
 	this.SelectedCharacter = character;
-	this.View.paths = this.FindPaths();
-	this.View.attackpaths = this.FindAttackPaths(this.View.paths);
+	this.FindPaths();
+	this.FindAttackPaths();
 	this.View.PaintTiles();
 }
 
@@ -104,9 +120,9 @@ MapModel.prototype.EnumerateEdges = function() {
 };
 
 // returns an associative array with the predecessor for each vertex within attack range
-MapModel.prototype.FindAttackPaths = function(paths){
+MapModel.prototype.FindAttackPaths = function(){
 	// if there are no paths to use, or no characte to move, return
-	if (paths == null || this.SelectedCharacter == null)
+	if (this.paths == null || this.SelectedCharacter == null)
 		return;
 
 	var that = this;
@@ -114,25 +130,25 @@ MapModel.prototype.FindAttackPaths = function(paths){
 
 	// iterate through all vertices in the existing movement path, adding unused vertice within attack range
 	// to the return set
-	for(var index in paths){
-		var source = paths[index];
+	for(var index in that.paths){
+		var source = that.paths[index];
 
 		// add attack tiles in a "diamond" shape around the character
 		for(var i = -that.SelectedCharacter.attackrange; i <= that.SelectedCharacter.attackrange; i++){ // e.g. ranges from -2 to 0 to 2
 			var j = Math.abs(i) - that.SelectedCharacter.attackrange; // e.g. ranges from 0 to -2 to 0
 
 			// if the target isn't already part of the set of movement tiles, then add it to the set of attack tiles
-			if(typeof(paths[source.x + i + "-" + source.y + j]) == 'undefined'){
+			if(typeof(that.paths[source.x + i + "-" + source.y + j]) == 'undefined'){
 				retVal[(source.x + i) + "-" + (source.y + j)] = {x: source.x + i, y: source.y + j};
 			}
-			if(typeof(paths[source.x + i + "-" + source.y - j]) == 'undefined'){
+			if(typeof(that.paths[source.x + i + "-" + source.y - j]) == 'undefined'){
 				retVal[(source.x + i) + "-" + (source.y - j)] = {x: source.x + i, y: source.y - j};
 			}
 		}
 	}
 
-	// return the set of attack tiles
-	return retVal;
+	// set the new attackpaths value to the set of attack tiles
+	this.attackpaths = retVal;
 }
 
 // returns an associative array with the predecessor for each vertex within movement range
@@ -183,8 +199,8 @@ MapModel.prototype.FindPaths = function(){
 	// set the starting point of the paths set
 	retVal.start = {x: this.SelectedCharacter.x, y: this.SelectedCharacter.y};
 
-	// return the array of vertices
-	return retVal;
+	// set the new paths value to the array of vertices
+	this.paths = retVal;
 }
 
 // add vertices to the priority queue if they have not already been, and update their edge costs

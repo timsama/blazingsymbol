@@ -22,6 +22,8 @@ function Character(stats){
 
 // moves the Character to a specified grid location
 Character.prototype.MoveTo = function(param){
+	var paths = this.model.paths;
+
 	// set movement variables
 	var dx = param.x - this.x;
 	var dy = param.y - this.y;
