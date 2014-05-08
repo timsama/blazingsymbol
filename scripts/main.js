@@ -26,7 +26,8 @@ $(function() {
 		,[1,1,1,1,1,1,1,1,1,255,255,255,255]
 		,[1,1,1,1,1,1,1,1,1,255,255,255,255]
 		,[1,1,1,1,1,1,1,1,1,255,255,255,255]],
-		origin_x: 13, origin_y: 10
+		origin_x: 13, origin_y: 10,
+		CharacterList: [new Character( { id: "MainGuy", x: 7, y: 7, range: 5, attackrange: 1, img: "Character Princess Girl.png" } )]
 	});
 
 	// create the map

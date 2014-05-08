@@ -5,12 +5,13 @@ function MapModel(mapstats){
 	this.height = mapstats.height;
 	this.costMatrix = mapstats.costMatrix;
 	this.EnumerateEdges();
+	this.CharacterList = mapstats.CharacterList;
+	this.SelectedCharacter = null;
 
-	// to be moved into Character eventually
-	this.range = 7;
-	this.attackrange = 1;
-	this.origin_x = mapstats.origin_x;
-	this.origin_y = mapstats.origin_y;
+	// set the model for each character in the list to this
+	for(var key in this.CharacterList){
+		this.CharacterList[key].model = this;
+	}
 };
 
 // returns the traversal cost of a single tile in the map
@@ -27,8 +28,23 @@ MapModel.prototype.GetCost = function(x, y){
 
 // sets the origin to find all paths from
 MapModel.prototype.SetOrigin = function(param){
-	this.origin_x = param.data.x;
-	this.origin_y = param.data.y;
+	this.SelectedCharacter.MoveTo({x: param.data.x, y: param.data.y});
+}
+
+// selects or deselects a character for their turn
+MapModel.prototype.SelectCharacter = function(character){
+	// deselect and return if we're just deselecting
+	if(character == null){
+		this.SelectedCharacter = null;
+		this.View.paths = null;
+		this.View.PaintTiles();
+		return;
+	}
+
+	// otherwise, select the passed-in character and paint their available tiles
+	this.SelectedCharacter = character;
+	this.View.paths = this.FindPaths();
+	this.View.PaintTiles();
 }
 
 // enumerates all edges available on this map
@@ -72,6 +88,10 @@ MapModel.prototype.EnumerateEdges = function() {
 
 // returns an associative array with the predecessor for each vertex within attack range
 MapModel.prototype.FindAttackPaths = function(paths){
+	// if there are no paths to use, or no characte to move, return
+	if (paths == null || this.SelectedCharacter == null)
+		return;
+
 	var that = this;
 	var retVal = new Array();
 
@@ -81,8 +101,8 @@ MapModel.prototype.FindAttackPaths = function(paths){
 		var source = paths[index];
 
 		// handle attacks to the northwest
-		for(var i = -that.attackrange; i <= that.attackrange; i++){ // e.g. ranges from -2 to 0 to 2
-			var j = Math.abs(i) - that.attackrange; // e.g. ranges from 0 to -2 to 0
+		for(var i = -that.SelectedCharacter.attackrange; i <= that.SelectedCharacter.attackrange; i++){ // e.g. ranges from -2 to 0 to 2
+			var j = Math.abs(i) - that.SelectedCharacter.attackrange; // e.g. ranges from 0 to -2 to 0
 
 			// if the target isn't already part of the set of movement tiles, then add it to the set of attack tiles
 			if(typeof(paths[source.x + i + "-" + source.y + j]) == 'undefined'){
@@ -100,10 +120,14 @@ MapModel.prototype.FindAttackPaths = function(paths){
 
 // returns an associative array with the predecessor for each vertex within movement range
 MapModel.prototype.FindPaths = function(){
+	// if there is no character to move, return
+	if (this.SelectedCharacter == null)
+		return;
+
 	// use Dijkstra's Algorithm to find which vertices are in range
 	var PQ = new PriorityQueue();
 	var retVal = new Array();
-	var current = this.VertexList[this.origin_x][this.origin_y];
+	var current = this.VertexList[this.SelectedCharacter.x][this.SelectedCharacter.y];
 	$.each(this.VertexList, function(key1, val1){
 		$.each(val1, function(key2, val2){
 			val2.cost = 200;
@@ -123,7 +147,7 @@ MapModel.prototype.FindPaths = function(){
 		current = PQ.Dequeue();
 
 		// only get a vertex's outgoing edges if it is within range itself
-		if(current.cost <= that.range){
+		if(current.cost <= that.SelectedCharacter.range){
 			$.each(current, function(index, value){
 				Update(current, value, that.VertexList[value.x][value.y], PQ);
 			});
@@ -135,7 +159,7 @@ MapModel.prototype.FindPaths = function(){
 	}
 
 	// set the starting point of the paths set
-	retVal.start = {x: this.origin_x, y: this.origin_y};
+	retVal.start = {x: this.SelectedCharacter.x, y: this.SelectedCharacter.y};
 
 	// return the array of vertices
 	return retVal;
@@ -149,12 +173,8 @@ function Update(vertex_a, edge, vertex_b, PQ){
 		PQ.Enqueue(vertex_b);
 	}
 
-//	if(vertex_b.x == 12 && vertex_b.y == 10)
-//		alert("At (" + vertex_b.x + "-" + vertex_b.y + "), Cost: " + vertex_b.cost + " > " + vertex_a.cost + " + " + edge.cost);
-
 	// otherwise, just update if possible
 	if (vertex_b.cost > vertex_a.cost + edge.cost){
-		//alert("Vertex " + vertex_b.x + "-" + vertex_b.y + ", cost " + vertex_b.cost + " > " + vertex_a.cost + " + " + edge.cost);
 		vertex_b.cost = vertex_a.cost + edge.cost;
 		vertex_b.predecessor = vertex_a;
 	}

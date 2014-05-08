@@ -3,6 +3,7 @@ function MapView(mapstats){
 	this.width = mapstats.width;
 	this.height = mapstats.height;
 	this.MapModel = new MapModel(mapstats);
+	this.MapModel.View = this;
 	this.mapimage = mapstats.mapimage;
 
 	// find the paths from the current starting point
@@ -102,7 +103,7 @@ MapView.prototype.DrawPath = function(end){
 	// if the destination is not in the paths set, don't draw anything new
 	var index = end.data.x + "-" + end.data.y;
 	var prev = index;
-	if(typeof(this.paths[index]) == 'undefined')
+	if(this.paths == null || typeof(this.paths[index]) == 'undefined')
 		return;
 
 	// clear existing arrows out
