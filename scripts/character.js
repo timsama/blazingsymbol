@@ -7,6 +7,7 @@ function Character(stats){
 	this.attackrange = stats.attackrange;
 	this.img = stats.img;
 	this.selected = false;
+	this.faction = stats.faction;
 	
 	// draw the character on the page
 	this.element = $('<img id="' + this.id + '" src="images/' + this.img + '" class="character">');
@@ -35,6 +36,11 @@ Character.prototype.MoveTo = function(param){
 
 // selects this character and sets up the map to show available moves
 Character.prototype.Select = function(){
+	// if this character isn't a friend, it can't be selected
+	if(this.faction != "Friend")
+		return;
+
+	// toggle this character's selection status, and update the model to show it
 	if(this.selected){
 		this.Deselect();
 	} else {

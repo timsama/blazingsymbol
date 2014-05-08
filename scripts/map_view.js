@@ -18,7 +18,7 @@ function MapView(mapstats){
 // sets a new location to draw arrows from
 MapView.prototype.SetOrigin = function(param){
 	// check if the new origin is within the set of accessible tiles
-	if(typeof(this.paths[param.data.x + "-" + param.data.y]) == 'undefined')
+	if(this.paths == null || typeof(this.paths[param.data.x + "-" + param.data.y]) == 'undefined')
 		return;
 
 	// set the new origin
@@ -74,6 +74,9 @@ MapView.prototype.PaintAttackTile = function(param){
 
 // paints all tiles available to be moved to or attacked
 MapView.prototype.PaintTiles = function(){
+	// remove existing arrows
+	this.ClearArrows();
+
 	// remove all existing tints
 	$('.transparent').removeClass('transparent');
 	$('.available').removeClass('available');
@@ -224,6 +227,11 @@ MapView.prototype.drawend = function(prev, here){
 	// add click and mouseover functionality to prevent blocking by the arrow image
 	//$("#pathend").mouseup({xpath:view.displaypath.x, ypath:view.displaypath.y, currentx: here.x, currenty: here.y, i:0}, followPath).mouseover({x:here.x, y:here.y}, addtopath);
 	$("#pathend").mouseover({x:here.x, y:here.y}, DrawPath).mouseup({x:here.x, y:here.y}, SetOrigin);
+}
+
+// clears all currently-drawn arrows
+MapView.prototype.ClearArrows = function(){
+	$("div[id='arrows']").empty();
 }
 
 // static helper method for mouseover events to call to draw a path

@@ -8,9 +8,21 @@ function MapModel(mapstats){
 	this.CharacterList = mapstats.CharacterList;
 	this.SelectedCharacter = null;
 
+	// initialize the map of obstacles that block movement
+	var that = this;
+	that.ObstacleMap = new Array(that.width);
+	for(var i = 0; i < that.width; i++){
+		that.ObstacleMap[i] = new Array(that.height);
+		for(var j = 0; j < that.height; j++){
+			that.ObstacleMap[i][j] = null;
+		}
+	}
+
 	// set the model for each character in the list to this
-	for(var key in this.CharacterList){
-		this.CharacterList[key].model = this;
+	for(var key in that.CharacterList){
+		var actor = that.CharacterList[key];
+		actor.model = that;
+		that.ObstacleMap[actor.x][actor.y] = actor;
 	}
 };
 
@@ -28,6 +40,9 @@ MapModel.prototype.GetCost = function(x, y){
 
 // sets the origin to find all paths from
 MapModel.prototype.SetOrigin = function(param){
+	this.View.ClearArrows();
+	this.ObstacleMap[this.SelectedCharacter.x][this.SelectedCharacter.y] = null;
+	this.ObstacleMap[param.data.x][param.data.y] = this.SelectedCharacter;
 	this.SelectedCharacter.MoveTo({x: param.data.x, y: param.data.y});
 }
 
@@ -37,6 +52,7 @@ MapModel.prototype.SelectCharacter = function(character){
 	if(character == null){
 		this.SelectedCharacter = null;
 		this.View.paths = null;
+		this.View.attackpaths = null;
 		this.View.PaintTiles();
 		return;
 	}
@@ -44,6 +60,7 @@ MapModel.prototype.SelectCharacter = function(character){
 	// otherwise, select the passed-in character and paint their available tiles
 	this.SelectedCharacter = character;
 	this.View.paths = this.FindPaths();
+	this.View.attackpaths = this.FindAttackPaths(this.View.paths);
 	this.View.PaintTiles();
 }
 
@@ -100,7 +117,7 @@ MapModel.prototype.FindAttackPaths = function(paths){
 	for(var index in paths){
 		var source = paths[index];
 
-		// handle attacks to the northwest
+		// add attack tiles in a "diamond" shape around the character
 		for(var i = -that.SelectedCharacter.attackrange; i <= that.SelectedCharacter.attackrange; i++){ // e.g. ranges from -2 to 0 to 2
 			var j = Math.abs(i) - that.SelectedCharacter.attackrange; // e.g. ranges from 0 to -2 to 0
 
@@ -148,13 +165,18 @@ MapModel.prototype.FindPaths = function(){
 
 		// only get a vertex's outgoing edges if it is within range itself
 		if(current.cost <= that.SelectedCharacter.range){
-			$.each(current, function(index, value){
-				Update(current, value, that.VertexList[value.x][value.y], PQ);
-			});
+			// check that the current vertex is not occupied by an enemy or NPC
+			var obs = that.ObstacleMap[current.x][current.y];
+			if(obs == null || obs.faction == "Friend" || obs.faction == "Ally"){
+				// add/update each outgoing edge from this vertex
+				$.each(current, function(index, value){
+					Update(current, value, that.VertexList[value.x][value.y], PQ);
+				});
 
-			// add the current vertex to the list of valid vertices
-			retVal[current.x + "-" + current.y] = current;
-			retVal[current.x + "-" + current.y].key = current.x + "-" + current.y;
+				// add the current vertex to the list of valid vertices
+				retVal[current.x + "-" + current.y] = current;
+				retVal[current.x + "-" + current.y].key = current.x + "-" + current.y;
+			}
 		}
 	}
 

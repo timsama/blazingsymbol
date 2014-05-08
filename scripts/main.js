@@ -27,7 +27,9 @@ $(function() {
 		,[1,1,1,1,1,1,1,1,1,255,255,255,255]
 		,[1,1,1,1,1,1,1,1,1,255,255,255,255]],
 		origin_x: 13, origin_y: 10,
-		CharacterList: [new Character( { id: "MainGuy", x: 7, y: 7, range: 5, attackrange: 1, img: "Character Princess Girl.png" } )]
+		CharacterList: [new Character( { id: "Princess", x: 7, y: 7, range: 5, attackrange: 1, img: "Character Princess Girl.png", faction: "Friend" } ),
+						new Character( { id: "HornGirl", x: 12, y: 9, range: 7, attackrange: 1, img: "Character Horn Girl.png", faction: "Friend" } ),
+						new Character( { id: "HornGirl", x: 10, y: 10, range: 6, attackrange: 0, img: "Enemy Bug.png", faction: "Enemy" } )]
 	});
 
 	// create the map
