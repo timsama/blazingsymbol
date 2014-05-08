@@ -23,17 +23,48 @@ function Character(stats){
 // moves the Character to a specified grid location
 Character.prototype.MoveTo = function(param){
 	var paths = this.model.paths;
+	var index = param.x + "-" + param.y;
+	var anim_path = new Array();
 
-	// set movement variables
-	var dx = param.x - this.x;
-	var dy = param.y - this.y;
-	
-	// set the new position
-	this.x = param.x;
-	this.y = param.y;
+	// add the destination
+	anim_path.push(paths[index]);
+
+	// add the stops on the way to the destination
+	while (paths[index].predecessor != paths[index]){
+		anim_path.push(paths[index]);
+		index = paths[index].predecessor.key;
+	}
+	var i = anim_path.length;
 	
 	// animate the character to the new position
-	this.element.animate({ left: ("+=" + 50 * dx), top: ("+=" + 50 * dy) }, 150, "linear");
+	this.MoveStep(anim_path, i-1);
+}
+
+// moves the character a single step towards the destination
+Character.prototype.MoveStep = function(arr, i){
+	// if the index is less than zero, return
+	if(i < 0){
+		// find the new paths from this location
+		this.model.FindPaths();
+		this.model.FindAttackPaths();
+
+		// repaint the view
+		this.model.View.PaintTiles();
+		return;
+	}
+
+	// set movement variables
+	var dx = arr[i].x - this.x;
+	var dy = arr[i].y - this.y;
+	
+	// set the new position
+	this.x = arr[i].x;
+	this.y = arr[i].y;
+	
+	// animate the character to the new position
+	var that = this;
+	this.element.animate({ left: ("+=" + 50 * dx), top: ("+=" + 50 * dy) }, 100, "linear", function(){that.MoveStep(arr, i-1)});
+
 }
 
 // selects this character and sets up the map to show available moves

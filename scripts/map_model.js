@@ -53,13 +53,6 @@ MapModel.prototype.SetOrigin = function(param){
 	
 	// animate the character to their new location
 	this.SelectedCharacter.MoveTo({x: param.data.x, y: param.data.y});
-
-	// find the new paths from this location
-	this.FindPaths();
-	this.FindAttackPaths();
-
-	// repaint the view
-	this.View.PaintTiles();
 }
 
 // selects or deselects a character for their turn
