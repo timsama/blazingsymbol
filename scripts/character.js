@@ -3,11 +3,15 @@ function Character(stats){
 	this.id = stats.id;
 	this.x = stats.x;
 	this.y = stats.y;
-	this.range = stats.range;
+	this.move = stats.move;
+	this.range = this.move;
 	this.attackrange = stats.attackrange;
 	this.img = stats.img;
 	this.selected = false;
 	this.faction = stats.faction;
+	this.availableAbilities = stats.availableAbilities;
+	this.equippedAbilities = stats.equippedAbilities;
+	this.enabled = true;
 	
 	// draw the character on the page
 	this.element = $('<img id="' + this.id + '" src="images/' + this.img + '" class="character">');
@@ -40,10 +44,27 @@ Character.prototype.MoveTo = function(param){
 	this.MoveStep(anim_path, i-1);
 }
 
+// resets the character's move and enabled status for the beginning of a new turn
+Character.prototype.NextTurn = function(){
+	this.range = this.move;
+	this.enabled = true;
+	this.element.removeClass("disabled");
+}
+
 // moves the character a single step towards the destination
 Character.prototype.MoveStep = function(arr, i){
 	// if the index is less than zero, return
 	if(i < 0){
+		// if the unit has finished moving and does not have the Canto ability, it's done moving
+		if(typeof(this.equippedAbilities["Canto"]) != 'undefined')
+			this.range -= (arr.length - 1);
+		else
+			this.range = 0;
+
+		// if there is no more range to move, disable this unit
+		if(this.range <= 0)
+			this.element.addClass("disabled");
+
 		// find the new paths from this location
 		this.model.FindPaths();
 		this.model.FindAttackPaths();

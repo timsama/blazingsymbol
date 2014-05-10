@@ -7,9 +7,49 @@ function MapView(mapstats){
 	this.mapimage = mapstats.mapimage;
 
 	// draw the tiles for the first time
+	this.Preload();
 	this.DrawTiles();
 	this.PaintTiles();
 };
+
+// preloads images used by the map
+MapView.prototype.Preload = function(){
+	var preloadHTML = "";
+	var that = this;
+
+	// preload character sprites
+	for(var key in that.CharacterList){
+		preloadHTML += imageHTML(that.CharacterList[key].img);
+	}
+
+	// preload background image
+	preloadHTML += imageHTML(this.mapimage);
+
+	// preload arrow corners
+	preloadHTML += imageHTML("b_l_corner.png");
+	preloadHTML += imageHTML("b_r_corner.png");
+	preloadHTML += imageHTML("u_l_corner.png");
+	preloadHTML += imageHTML("u_r_corner.png");
+
+	// preload arrow heads
+	preloadHTML += imageHTML("left_arrow.png");
+	preloadHTML += imageHTML("right_arrow.png");
+	preloadHTML += imageHTML("up_arrow.png");
+	preloadHTML += imageHTML("down_arrow.png");
+
+	// preload arrow stubs
+	preloadHTML += imageHTML("left_stub.png");
+	preloadHTML += imageHTML("right_stub.png");
+	preloadHTML += imageHTML("up_stub.png");
+	preloadHTML += imageHTML("down_stub.png");
+
+	return preloadHTML;
+}
+
+// helper function to return a string of the HTML needed to create an image with the given source
+function imageHTML(src){
+	return "<img src='	images/" + src + "'/>";
+}
 
 // sets a new location to draw arrows from
 MapView.prototype.SetOrigin = function(param){
@@ -229,10 +269,10 @@ MapView.prototype.ClearArrows = function(){
 
 // static helper method for mouseover events to call to draw a path
 function DrawPath(end){
-	map.DrawPath(end);
+	battle.map.DrawPath(end);
 }
 
 // static helper method for mouseup events to set a new path starting point
 function SetOrigin(param){
-	map.SetOrigin(param);
+	battle.map.SetOrigin(param);
 }

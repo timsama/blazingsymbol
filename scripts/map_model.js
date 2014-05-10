@@ -20,6 +20,10 @@ function MapModel(mapstats){
 
 	// set the model for each character in the list to this
 	for(var key in that.CharacterList){
+		// call the constructor on the object give by the JSON
+		that.CharacterList[key] = new Character(that.CharacterList[key]);
+		
+		// place the character in the obstacle map
 		var actor = that.CharacterList[key];
 		actor.model = that;
 		that.ObstacleMap[actor.x][actor.y] = actor;
