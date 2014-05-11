@@ -10,13 +10,8 @@ function PreloadUI(){
 	var preloadHTML = "";
 
 	// preload UI elements
-	preloadHTML += imageHTML("gameover.png");
-	preloadHTML += imageHTML("grid.png");
-	preloadHTML += imageHTML("keysnow.png");
-	preloadHTML += imageHTML("playagain.png");
-	preloadHTML += imageHTML("tryagain.png");
-	preloadHTML += imageHTML("you win.png");
-	preloadHTML += imageHTML("title.png");	
+	preloadHTML += imageHTML("your_turn.png");
+	preloadHTML += imageHTML("enemy_turn.png");
 
 	// load the images into the page
 	$("#preload").append(preloadHTML);

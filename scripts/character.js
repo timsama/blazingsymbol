@@ -1,17 +1,20 @@
 // instantiates a Character class object
 function Character(stats){
+	// unchanging attributes (in battle)
 	this.id = stats.id;
-	this.x = stats.x;
-	this.y = stats.y;
 	this.move = stats.move;
-	this.range = this.move;
-	this.attackrange = stats.attackrange;
 	this.img = stats.img;
-	this.selected = false;
 	this.faction = stats.faction;
 	this.availableAbilities = stats.availableAbilities;
 	this.equippedAbilities = stats.equippedAbilities;
+
+	// attributes that change in battle
+	this.x = stats.x;
+	this.y = stats.y;
+	this.selected = false;
 	this.enabled = true;
+	this.range = this.move;
+	this.attackrange = stats.attackrange;
 	
 	// draw the character on the page
 	this.element = $('<img id="' + this.id + '" src="images/' + this.img + '" class="character">');
@@ -48,6 +51,7 @@ Character.prototype.MoveTo = function(param){
 Character.prototype.NextTurn = function(){
 	this.range = this.move;
 	this.enabled = true;
+	this.selected = false;
 	this.element.removeClass("disabled");
 }
 
@@ -62,8 +66,10 @@ Character.prototype.MoveStep = function(arr, i){
 			this.range = 0;
 
 		// if there is no more range to move, disable this unit
-		if(this.range <= 0)
+		if(this.range <= 0){
 			this.element.addClass("disabled");
+			this.enabled = false;
+		}
 
 		// find the new paths from this location
 		this.model.FindPaths();
@@ -71,6 +77,9 @@ Character.prototype.MoveStep = function(arr, i){
 
 		// repaint the view
 		this.model.View.PaintTiles();
+
+		// check if it's the end of the turn
+		this.model.CheckEndOfTurn();
 		return;
 	}
 
@@ -85,7 +94,6 @@ Character.prototype.MoveStep = function(arr, i){
 	// animate the character to the new position
 	var that = this;
 	this.element.animate({ left: ("+=" + 50 * dx), top: ("+=" + 50 * dy) }, 100, "linear", function(){that.MoveStep(arr, i-1)});
-
 }
 
 // selects this character and sets up the map to show available moves

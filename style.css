@@ -142,18 +142,18 @@ body {
 	z-index: 10;
 	opacity: 0;
 	position: absolute;
-	top:208px;
-	left:308px;	
+	top:258px;
+	left:358px;	
 }
 
-/* Creates a dark shadow backdrop for the game end screen */
-#shadow {
+/* Creates a dark shadow backdrop for turn change messages */
+#turn_shadow {
 	position: absolute;
 	left: 8px;
-	top: 8px;
+	top: 258px;
 	z-index: 5;
 	width: 1000px;
-	height: 650px;
+	height: 100px;
 	opacity: 0;
 }
 

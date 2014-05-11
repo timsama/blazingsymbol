@@ -34,6 +34,23 @@ function MapModel(mapstats){
 	this.FindAttackPaths();
 };
 
+// checks to see if all characters have finished moving
+MapModel.prototype.CheckEndOfTurn = function(){
+	var endturn = true;
+	var that = this;
+
+	// if any characters are still enabled, don't end the turn
+	for(var key in this.CharacterList){
+		if(that.CharacterList[key].enabled && that.CharacterList[key].faction == "Friend")
+			endturn = false;
+	}
+
+	// if the turn is ending, then trigger the event for it
+	if(endturn){
+		$("#gameboard").trigger("EndOfTurn");
+	}
+}
+
 // returns the traversal cost of a single tile in the map
 MapModel.prototype.GetCost = function(x, y){
 	// make sure coordinate is in bounds
@@ -48,8 +65,8 @@ MapModel.prototype.GetCost = function(x, y){
 
 // sets the origin to find all paths from
 MapModel.prototype.SetOrigin = function(param){
-	// clear existing arrows from the view
-	this.View.ClearArrows();
+	// tell the gameboard a character has moved, so it will clear existing arrows
+	$("#gameboard").trigger("CharacterMoved");
 	
 	// move this character's location in the obstacle map
 	this.ObstacleMap[this.SelectedCharacter.x][this.SelectedCharacter.y] = null;
@@ -66,7 +83,7 @@ MapModel.prototype.SelectCharacter = function(character){
 		this.SelectedCharacter = null;
 		this.paths = null;
 		this.attackpaths = null;
-		this.View.PaintTiles();
+		$("#gameboard").trigger("CharacterSelected");
 		return;
 	}
 
@@ -74,7 +91,9 @@ MapModel.prototype.SelectCharacter = function(character){
 	this.SelectedCharacter = character;
 	this.FindPaths();
 	this.FindAttackPaths();
-	this.View.PaintTiles();
+
+	// tell the gameboard that a character has been selected so it can redraw
+	$("#gameboard").trigger("CharacterSelected");
 }
 
 // enumerates all edges available on this map

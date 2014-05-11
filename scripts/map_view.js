@@ -10,6 +10,11 @@ function MapView(mapstats){
 	this.Preload();
 	this.DrawTiles();
 	this.PaintTiles();
+
+	// set up event handlers
+	var that = this;
+	$("#gameboard").on("CharacterSelected", function(){ that.PaintTiles(); });
+	$("#gameboard").on("CharacterMoved", function(){ that.ClearArrows(); });
 };
 
 // preloads images used by the map
